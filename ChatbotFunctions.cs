@@ -5,83 +5,97 @@ namespace Chatbot
 {
     public class ChatbotFunctions
     {
-        // This is the line that gets printed between sections
-        static string line = "--------------------------------------------";
+        // Saves time by creating a global variable for the star separator used in multiple places
+        static string stars = "* * * * * * * * * * * * * * * * * * * * *";
 
-        // This function shows the welcome banner when the program starts
-        public static void ShowGreeting()
+        // Greeting method
+        public static void Greeting()
         {
-            Console.WriteLine(line);
-            Console.WriteLine("   ___      _              ___       _   ");
-            Console.WriteLine("  / __\\_  _| |__   ___ _ _| _ ) ___ | |_ ");
-            Console.WriteLine(" / /  | || | '_ \\ / -_) '_| _ \\/ _ \\|  _|");
-            Console.WriteLine(" \\/    \\_, |_.__/ \\___|_| |___/\\___/ \\__|");
-            Console.WriteLine("       |__/                                ");
-            Console.WriteLine(line);
-            Console.WriteLine("  Welcome to CyberBot - Cybersecurity Assistant");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("");
+            Console.WriteLine(stars);
+            Console.WriteLine(" CyberBot - Your Cybersecurity Assistant ");
+            Console.WriteLine(stars);
+            Console.WriteLine("");
+            Console.ResetColor();
         }
 
-        // This function asks the user for their name
-        public static string GetUserName()
+        // This asks the user for their name
+        public static string UserName()
         {
-            Console.Write("CyberBot: Before we begin, what is your name? ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("ChatBot: What is your name? ");
+            Console.ResetColor();
 
             string? name = Console.ReadLine();
 
             // Keep asking if they leave the name blank
             while (string.IsNullOrWhiteSpace(name))
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("CyberBot: Please enter a valid name: ");
+                Console.ResetColor();
                 name = Console.ReadLine();
             }
 
             Console.WriteLine("");
-            Console.WriteLine("CyberBot: Nice to meet you, " + name + "!");
-            Console.WriteLine("CyberBot: Type 'help' to see what I can help you with.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ChatBot: Hello " + name + "!");
+            Console.WriteLine("ChatBot: I'm here to help you learn about cybersecurity.");
+            Console.ResetColor();
 
             return name.Trim();
         }
 
-        // This function shows all the topics the user can ask about
-        public static void ShowHelp()
+        // This shows the user the list of topics they can ask about
+        public static void Help()
         {
             Console.WriteLine("");
-            Console.WriteLine(line);
-            Console.WriteLine("  Topics you can ask me about:");
-            Console.WriteLine(line);
-            Console.WriteLine("  how are you           - Check on the bot");
-            Console.WriteLine("  what's your purpose   - Learn what CyberBot does");
-            Console.WriteLine("  what can i ask you about - See this menu");
-            Console.WriteLine("  safe browsing         - Safe browsing tips");
-            Console.WriteLine("  phishing              - How to spot phishing");
-            Console.WriteLine("  password safety       - Password best practices");
-            Console.WriteLine("  exit                  - Quit the chatbot");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.WriteLine("   What do you want to learn about cybersecurity?");
+            Console.WriteLine(stars);
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("  1 - What can I ask you about");
+            Console.WriteLine("  2 - What's your purpose");
+            Console.WriteLine("  3 - How are you");
+            Console.WriteLine("  4 - Safe browsing tips");
+            Console.WriteLine("  5 - Phishing warning signs");
+            Console.WriteLine("  6 - Password safety tips");
+            Console.WriteLine("  0 - Exit the chatbot");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.ResetColor();
         }
 
-        // This function responds when the user asks how the bot is doing
-        public static void RespondHowAreYou(string name)
+        // Responds to the user asking how the chatbot is doing
+        public static void HowAreYou(string name)
         {
             Console.WriteLine("");
-            Console.WriteLine("CyberBot: I am running perfectly, thanks for asking " + name + "!");
-            Console.WriteLine("CyberBot: Ready to help you stay safe online.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ChatBot: I'm doing well and ready to help you learn about cybersecurity, " + name + "!");
+            Console.ResetColor();
         }
 
-        // This function explains what the chatbot is for
-        public static void RespondPurpose(string name)
+        // Explains what the chatbot is for when the user asks about its purpose
+        public static void Purpose(string name)
         {
             Console.WriteLine("");
-            Console.WriteLine("CyberBot: Great question " + name + "!");
-            Console.WriteLine("CyberBot: I am here to help teach you about cybersecurity.");
-            Console.WriteLine("CyberBot: You can ask me about safe browsing, phishing and password safety.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ChatBot: Great question " + name + "!");
+            Console.WriteLine("ChatBot: I am here to help teach you about cybersecurity.");
+            Console.WriteLine("ChatBot: You can ask me about safe browsing, phishing and password safety.");
+            Console.ResetColor();
         }
 
-        // This function gives the user safe browsing tips
-        public static void RespondSafeBrowsing()
+        // Safe browsing tips when the user asks about them
+        public static void SafeBrowsing()
         {
-            // Store all the tips in an array
+            // Store all the tips in variables
             string tip1 = "Always check for HTTPS in the URL before entering data.";
             string tip2 = "Avoid clicking suspicious links in emails or messages.";
             string tip3 = "Keep your browser and extensions up to date.";
@@ -89,22 +103,28 @@ namespace Chatbot
             string tip5 = "Avoid using public Wi-Fi for banking without a VPN.";
 
             Console.WriteLine("");
-            Console.WriteLine(line);
-            Console.WriteLine("  Safe Browsing Tips");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.WriteLine("   Safe Browsing Tips");
+            Console.WriteLine(stars);
+            Console.ResetColor();
 
             // Print each tip with a number
-            Console.WriteLine("  1. " + tip1);
-            Console.WriteLine("  2. " + tip2);
-            Console.WriteLine("  3. " + tip3);
-            Console.WriteLine("  4. " + tip4);
-            Console.WriteLine("  5. " + tip5);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("  1: " + tip1);
+            Console.WriteLine("  2: " + tip2);
+            Console.WriteLine("  3: " + tip3);
+            Console.WriteLine("  4: " + tip4);
+            Console.WriteLine("  5: " + tip5);
+            Console.ResetColor();
 
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.ResetColor();
         }
 
-        // This function explains how to spot a phishing attempt
-        public static void RespondPhishing()
+        // This explains how to spot a phishing attempt
+        public static void Phishing()
         {
             string flag1 = "Urgent language like - Your account will be closed!";
             string flag2 = "Sender addresses that look similar but are slightly off.";
@@ -113,59 +133,78 @@ namespace Chatbot
             string flag5 = "Poor grammar, odd formatting or unexpected attachments.";
 
             Console.WriteLine("");
-            Console.WriteLine(line);
-            Console.WriteLine("  Phishing Warning Signs");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.WriteLine("   Phishing Warning Signs");
+            Console.WriteLine(stars);
+            Console.ResetColor();
 
-            Console.WriteLine("  1. " + flag1);
-            Console.WriteLine("  2. " + flag2);
-            Console.WriteLine("  3. " + flag3);
-            Console.WriteLine("  4. " + flag4);
-            Console.WriteLine("  5. " + flag5);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("  1: " + flag1);
+            Console.WriteLine("  2: " + flag2);
+            Console.WriteLine("  3: " + flag3);
+            Console.WriteLine("  4: " + flag4);
+            Console.WriteLine("  5: " + flag5);
+            Console.ResetColor();
 
-            Console.WriteLine(line);
-            Console.WriteLine("  When in doubt do not click. Go directly to the official website.");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("");
+            Console.WriteLine("  * You should never click suspicious links! *");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.ResetColor();
         }
 
-        // This function shares password safety advice
-        public static void RespondPasswordSafety()
+        // This shares password safety advice
+        public static void PasswordSafety()
         {
             string advice1 = "Use at least 12 characters with letters, numbers and symbols.";
             string advice2 = "Never reuse the same password across different accounts.";
-            string advice3 = "Use a password manager like Bit warden or 1Password.";
-            string advice4 = "Enable two-factor authentication wherever possible.";
+            string advice3 = "Enable two-factor authentication wherever possible.";
+            string advice4 = "Change your passwords regularly.";
             string advice5 = "Avoid using personal info like birthdays or pet names.";
 
             Console.WriteLine("");
-            Console.WriteLine(line);
-            Console.WriteLine("  Password Safety Tips");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.WriteLine("   Password Safety Tips");
+            Console.WriteLine(stars);
+            Console.ResetColor();
 
-            Console.WriteLine("  1. " + advice1);
-            Console.WriteLine("  2. " + advice2);
-            Console.WriteLine("  3. " + advice3);
-            Console.WriteLine("  4. " + advice4);
-            Console.WriteLine("  5. " + advice5);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("  1: " + advice1);
+            Console.WriteLine("  2: " + advice2);
+            Console.WriteLine("  3: " + advice3);
+            Console.WriteLine("  4: " + advice4);
+            Console.WriteLine("  5: " + advice5);
+            Console.ResetColor();
 
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
+            Console.ResetColor();
         }
 
-        // This function handles input that the chatbot does not recognize
-        public static void RespondUnknown()
+        // This handles input that the chatbot does not recognize
+        public static void Validation()
         {
             Console.WriteLine("");
-            Console.WriteLine("CyberBot: I didn't quite understand that. Could you rephrase?");
-            Console.WriteLine("CyberBot: Type 'help' to see the list of available topics.");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ChatBot: Please enter a valid option from the menu.");
+            Console.WriteLine("ChatBot: Type 1 to see the list of available topics.");
+            Console.ResetColor();
         }
 
-        // This function says goodbye when the user exits
-        public static void ShowGoodbye(string name)
+        // Quit method
+        public static void Exit(string name)
         {
             Console.WriteLine("");
-            Console.WriteLine(line);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(stars);
             Console.WriteLine("  Goodbye " + name + "! Stay safe online.");
-            Console.WriteLine(line);
+            Console.WriteLine(stars);
+            Console.ResetColor();
         }
     }
 }

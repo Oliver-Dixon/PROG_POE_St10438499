@@ -1,5 +1,5 @@
 // Program.cs
-// This is the main file that runs the CyberBot chatbot
+// Main file that runs the CyberBot chatbot
 
 namespace Chatbot
 {
@@ -7,20 +7,21 @@ namespace Chatbot
     {
         static void Main(string[] args)
         {
-            // Show the welcome screen first
-            ChatbotFunctions.ShowGreeting();
+            // Welcome screen
+            ChatbotFunctions.Greeting();
 
             // Ask the user for their name and store it
-            string userName = ChatbotFunctions.GetUserName();
+            string userName = ChatbotFunctions.UserName();
 
-            // This variable controls when the chatbot stops running
+            // Help menu
+            ChatbotFunctions.Help();
+
+            // Keeps the program running until the user types 0 to exit
             bool running = true;
-
-            // Keep looping until the user types exit
             while (running)
             {
                 Console.WriteLine("");
-                Console.Write("[You]: ");
+                Console.Write("[" + userName + "]: ");
 
                 // Read what the user typed
                 string? rawInput = Console.ReadLine();
@@ -28,49 +29,48 @@ namespace Chatbot
                 // Check if the user typed nothing
                 if (string.IsNullOrWhiteSpace(rawInput))
                 {
-                    Console.WriteLine("CyberBot: I didn't quite understand that. Could you rephrase?");
-                    Console.WriteLine("");
+                    Console.WriteLine("ChatBot: Please enter a valid option from the menu.");
                     continue;
                 }
 
-                // Convert input to lowercase so it matches easier
-                string userInput = rawInput.Trim().ToLower();
+                // Store the input to compare later and trim any extra spaces
+                string userInput = rawInput.Trim();
 
-                // Check what the user typed and call the right function
-                if (userInput == "how are you")
+                // Check which number the user entered
+                if (userInput == "1")
                 {
-                    ChatbotFunctions.RespondHowAreYou(userName);
+                    ChatbotFunctions.Help();
                 }
-                else if (userInput == "what's your purpose" || userInput == "purpose")
+                else if (userInput == "2")
                 {
-                    ChatbotFunctions.RespondPurpose(userName);
+                    ChatbotFunctions.Purpose(userName);
                 }
-                else if (userInput == "what can i ask you about" || userInput == "help")
+                else if (userInput == "3")
                 {
-                    ChatbotFunctions.ShowHelp();
+                    ChatbotFunctions.HowAreYou(userName);
                 }
-                else if (userInput == "safe browsing")
+                else if (userInput == "4")
                 {
-                    ChatbotFunctions.RespondSafeBrowsing();
+                    ChatbotFunctions.SafeBrowsing();
                 }
-                else if (userInput == "phishing")
+                else if (userInput == "5")
                 {
-                    ChatbotFunctions.RespondPhishing();
+                    ChatbotFunctions.Phishing();
                 }
-                else if (userInput == "password safety")
+                else if (userInput == "6")
                 {
-                    ChatbotFunctions.RespondPasswordSafety();
+                    ChatbotFunctions.PasswordSafety();
                 }
-                else if (userInput == "exit")
+                else if (userInput == "0")
                 {
-                    // Say goodbye and stop the loop
-                    ChatbotFunctions.ShowGoodbye(userName);
+                    // Ends the program
+                    ChatbotFunctions.Exit(userName);
                     running = false;
                 }
                 else
                 {
                     // If nothing matched tell the user
-                    ChatbotFunctions.RespondUnknown();
+                    ChatbotFunctions.Validation();
                 }
             }
         }
