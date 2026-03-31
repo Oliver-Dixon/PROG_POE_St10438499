@@ -1,9 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatbot", "Chatbot\Chatbot.csproj", "{67046802-9301-4700-BEEA-1B4A8CDEDD94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatbot", "Chatbot.csproj", "{67046802-9301-4700-BEEA-1B4A8CDEDD94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
