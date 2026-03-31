@@ -6,9 +6,13 @@ namespace Chatbot
     {
         static void Main(string[] args)
         {
+
+            //voice greeting 
+            ChatbotFunctions.VoiceGreeting();
+
             // Welcome screen
             ChatbotFunctions.Greeting();
-
+            
             // Ask the user for their name and store it
             string userName = ChatbotFunctions.UserName();
 

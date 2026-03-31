@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Cs9HJqOertQ=",
+  "dgSpecHash": "4LlWhoNK/q8=",
   "success": true,
   "projectFilePath": "C:\\Projects\\Chatbot\\Chatbot.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\noxid\\.nuget\\packages\\system.windows.extensions\\8.0.0\\system.windows.extensions.8.0.0.nupkg.sha512",
     "C:\\Users\\noxid\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.24\\microsoft.netcore.app.ref.8.0.24.nupkg.sha512",
     "C:\\Users\\noxid\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.24\\microsoft.windowsdesktop.app.ref.8.0.24.nupkg.sha512",
     "C:\\Users\\noxid\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.24\\microsoft.aspnetcore.app.ref.8.0.24.nupkg.sha512",

@@ -1,11 +1,33 @@
 //Methods
-
+using System.Media;
 namespace Chatbot
 {
     public class ChatbotFunctions
     {
+        // Voice greeting 
+        public static void VoiceGreeting()
+        {
+            try
+            {
+                string audioPath = "greeting.wav";
+                if (File.Exists(audioPath))
+                {
+                    using var player = new System.Media.SoundPlayer(audioPath);
+                    player.PlaySync();
+                }
+                else
+                {
+                    Console.WriteLine("ChatBot: Audio file not found.");
+                }
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine("ChatBot: Could not play audio. " + error.Message);
+            }
+        }
+
         // Saves time by creating a global variable for the star separator used in multiple places
-        static string stars = "* * * * * * * * * * * * * * * * * * * * *";
+        static string stars = "* * * * * * * * * * * * * * * * * * * * * * * * * * * *";
 
         // Greeting method
         public static void Greeting()
@@ -26,7 +48,8 @@ namespace Chatbot
             ");
 
             Console.WriteLine(stars);
-            Console.WriteLine("       CyberBot - Your Cybersecurity Assistant");
+            Console.WriteLine("ChatBot A Cybersecurity Assistant");
+            Console.WriteLine("I'm here to help you learn about cybersecurity.");
             Console.WriteLine(stars);
             Console.WriteLine("");
             Console.ResetColor();
