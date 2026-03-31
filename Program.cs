@@ -1,5 +1,4 @@
-// Program.cs
-// Main file that runs the CyberBot chatbot
+//Main program
 
 namespace Chatbot
 {

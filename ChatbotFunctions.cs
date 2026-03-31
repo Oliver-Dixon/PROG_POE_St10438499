@@ -1,5 +1,4 @@
-// ChatbotFunctions.cs
-// This file holds all the functions that the chatbot uses
+//Methods
 
 namespace Chatbot
 {
@@ -14,7 +13,20 @@ namespace Chatbot
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("");
             Console.WriteLine(stars);
-            Console.WriteLine(" CyberBot - Your Cybersecurity Assistant ");
+
+            Console.WriteLine(@"
+
+
+           ___  _   _   ___   ____  ___   ___   ____ 
+          /  _|| |_| | / _ \ |_  _|| _ ) / _ \ |_  _|
+          | |_ |  _  || |_| | | |  | _ || |_| | | |  
+          \___||_| |_||_| |_| |_|  |___/ \___/  |_|  
+
+        
+            ");
+
+            Console.WriteLine(stars);
+            Console.WriteLine("       CyberBot - Your Cybersecurity Assistant");
             Console.WriteLine(stars);
             Console.WriteLine("");
             Console.ResetColor();
