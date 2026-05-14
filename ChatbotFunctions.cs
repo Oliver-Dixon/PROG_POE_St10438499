@@ -8,6 +8,9 @@ namespace Chatbot
         // Saves time by creating a global variable for the star separator used in multiple places
         static string stars = "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *";
 
+        // Used to pick a random response so the bot feels more varied
+        static Random random = new Random();
+
         // Voice greeting
         public static void PlayVoiceGreeting()
         {
@@ -55,6 +58,7 @@ namespace Chatbot
             string output = "";
             output += "ChatBot: Hello " + name + "!\n";
             output += "ChatBot: I'm here to help you learn about cybersecurity.\n";
+            output += "ChatBot: You can pick a number from the menu or just ask me about a topic.\n";
             return output;
         }
 
@@ -73,6 +77,7 @@ namespace Chatbot
             output += "  6 - Password safety tips\n";
             output += "  0 - Exit the chatbot\n";
             output += stars + "\n";
+            output += "  Or type a question with words like password, phishing, privacy, wifi, virus or hack.\n";
             return output;
         }
 
@@ -161,11 +166,88 @@ namespace Chatbot
             return output;
         }
 
+        // Looks for cybersecurity keywords in the user's input and returns a relevant response
+        // Returns an empty string if no keyword is found
+        public static string CheckKeywords(string input)
+        {
+            // Convert to lowercase so we catch words regardless of how they were typed
+            string lowerInput = input.ToLower();
+
+            // Password keyword with varied responses
+            if (lowerInput.Contains("password"))
+            {
+                string[] responses = {
+                    "Make sure to use strong, unique passwords for each account. Avoid using personal details in your passwords.",
+                    "A password manager can help you create and store strong passwords for every site you use.",
+                    "Strong passwords should be at least 12 characters and mix letters, numbers and symbols."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // Phishing or scam keyword
+            if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
+            {
+                string[] responses = {
+                    "Be careful with emails that create urgency or ask for personal information. Always verify the sender first.",
+                    "Phishing scams often use fake links. Hover over a link before clicking to see where it really goes.",
+                    "If an email looks suspicious, do not click any links. Go directly to the official website instead."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // Privacy keyword
+            if (lowerInput.Contains("privacy"))
+            {
+                string[] responses = {
+                    "Review your privacy settings on social media regularly and limit what you share publicly.",
+                    "Be careful what apps you give permissions to. Only allow access that is actually needed.",
+                    "Your privacy matters. Avoid sharing personal details like your address or birthday online."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // Wi-Fi keyword
+            if (lowerInput.Contains("wifi") || lowerInput.Contains("wi-fi"))
+            {
+                string[] responses = {
+                    "Public Wi-Fi networks are not secure. Avoid logging into important accounts when connected to them.",
+                    "If you need to use public Wi-Fi, a VPN will help keep your traffic encrypted and safe.",
+                    "Always make sure your home Wi-Fi is password protected with WPA2 or WPA3 encryption."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // Virus or malware keyword
+            if (lowerInput.Contains("virus") || lowerInput.Contains("malware"))
+            {
+                string[] responses = {
+                    "Keep your antivirus software up to date and run regular scans to catch threats early.",
+                    "Never download files or attachments from sources you do not trust as they may contain malware.",
+                    "Free software downloaded from random sites often comes bundled with viruses. Stick to official sources."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // Hack keyword
+            if (lowerInput.Contains("hack"))
+            {
+                string[] responses = {
+                    "If you think your account has been hacked, change your password immediately and enable two-factor authentication.",
+                    "Hackers often target weak passwords. Strong unique passwords are your best defence.",
+                    "Check haveibeenpwned.com to see if your email has been involved in any known data breaches."
+                };
+                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            }
+
+            // No keyword matched
+            return "";
+        }
+
         // This handles input that the chatbot does not recognize
         public static string Validation()
         {
             string output = "";
-            output += "\nChatBot: Please enter a valid option from the menu.\n";
+            output += "\nChatBot: Please enter a valid option from the menu or ask about a cybersecurity topic.\n";
             output += "ChatBot: Type 1 to see the list of available topics.\n";
             return output;
         }

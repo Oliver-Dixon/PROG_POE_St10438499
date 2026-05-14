@@ -186,8 +186,19 @@ namespace Chatbot
             }
             else
             {
-                // If nothing matched tell the user
-                chatBox.AppendText(ChatbotFunctions.Validation());
+                // If it was not a menu number, try to find a keyword in the input
+                string keywordResponse = ChatbotFunctions.CheckKeywords(userInput);
+
+                // If a keyword was found show the keyword response
+                if (!string.IsNullOrEmpty(keywordResponse))
+                {
+                    chatBox.AppendText(keywordResponse);
+                }
+                else
+                {
+                    // Otherwise tell the user the input was not understood
+                    chatBox.AppendText(ChatbotFunctions.Validation());
+                }
             }
 
             // Clear the input box for next entry
