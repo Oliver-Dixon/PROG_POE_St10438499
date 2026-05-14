@@ -77,7 +77,7 @@ namespace Chatbot
             output += "  6 - Password safety tips\n";
             output += "  0 - Exit the chatbot\n";
             output += stars + "\n";
-            output += "  Or type a question with words like password, phishing, privacy, wifi, virus or hack.\n";
+            output += "  Or type a question like 'give me a phishing tip' or 'password advice'.\n";
             return output;
         }
 
@@ -166,12 +166,72 @@ namespace Chatbot
             return output;
         }
 
+        // Returns a single random phishing tip
+        public static string RandomPhishingTip()
+        {
+            // Store all phishing tips in an array
+            string[] tips = {
+                "Be cautious of emails asking for personal information. Scammers often disguise themselves as trusted organisations.",
+                "Always check the sender's email address carefully. Phishers use addresses that look almost real but are slightly off.",
+                "Never click links in suspicious emails. Type the website address directly into your browser instead.",
+                "Look out for urgent language like 'Your account will be closed!' as this is a common phishing tactic.",
+                "If an email has poor grammar or unexpected attachments, it is likely a phishing attempt. Delete it."
+            };
+
+            // Pick a random tip from the array
+            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+        }
+
+        // Returns a single random safe browsing tip
+        public static string RandomBrowsingTip()
+        {
+            string[] tips = {
+                "Always check for HTTPS in the URL bar before entering any personal data.",
+                "Keep your browser and all extensions up to date to protect against security flaws.",
+                "Use a reputable ad-blocker to reduce your exposure to malicious advertisements.",
+                "Avoid using public Wi-Fi for banking or shopping unless you are using a VPN.",
+                "Bookmark important websites so you don't accidentally visit a fake version through a search engine."
+            };
+
+            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+        }
+
+        // Returns a single random password safety tip
+        public static string RandomPasswordTip()
+        {
+            string[] tips = {
+                "Use a password manager to generate and store strong, unique passwords for every account.",
+                "Make passwords at least 12 characters long with a mix of letters, numbers and symbols.",
+                "Enable two-factor authentication on every account that supports it for extra security.",
+                "Never reuse passwords across multiple sites because one breach could compromise all your accounts.",
+                "Change your passwords straight away if a service you use reports a data breach."
+            };
+
+            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+        }
+
         // Looks for cybersecurity keywords in the user's input and returns a relevant response
         // Returns an empty string if no keyword is found
         public static string CheckKeywords(string input)
         {
             // Convert to lowercase so we catch words regardless of how they were typed
             string lowerInput = input.ToLower();
+
+            // Check if the user is asking for a tip or advice on something
+            bool askingForTip = lowerInput.Contains("tip") || lowerInput.Contains("advice");
+
+            // If they want a tip on a specific topic give them one random tip from that topic
+            if (askingForTip)
+            {
+                if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
+                    return RandomPhishingTip();
+                if (lowerInput.Contains("browsing") || lowerInput.Contains("browser"))
+                    return RandomBrowsingTip();
+                if (lowerInput.Contains("password"))
+                    return RandomPasswordTip();
+            }
+
+            // General keyword matching for when the user is not asking for a tip directly
 
             // Password keyword with varied responses
             if (lowerInput.Contains("password"))
