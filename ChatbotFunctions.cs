@@ -6,7 +6,7 @@ namespace Chatbot
     public class ChatbotFunctions
     {
         // Saves time by creating a global variable for the star separator used in multiple places
-        static string stars = "* * * * * * * * * * * * * * * * * * * * *";
+        static string stars = "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *";
 
         // Voice greeting
         public static void PlayVoiceGreeting()
