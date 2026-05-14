@@ -14,6 +14,9 @@ namespace Chatbot
         // Memory - stores the user's main interest so the bot can refer back to it later
         static string userInterest = "";
 
+        // Stores the user's current sentiment so responses can adapt
+        static string userSentiment = "";
+
         // Voice greeting
         public static void PlayVoiceGreeting()
         {
@@ -180,7 +183,7 @@ namespace Chatbot
                 "If an email has poor grammar or unexpected attachments, it is likely a phishing attempt. Delete it."
             };
 
-            return "\nChatBot: " + GetRecallPrefix("phishing") + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("phishing") + tips[random.Next(tips.Length)] + "\n";
         }
 
         // Returns a single random safe browsing tip
@@ -194,7 +197,7 @@ namespace Chatbot
                 "Bookmark important websites so you don't accidentally visit a fake version through a search engine."
             };
 
-            return "\nChatBot: " + GetRecallPrefix("safe browsing") + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("safe browsing") + tips[random.Next(tips.Length)] + "\n";
         }
 
         // Returns a single random password safety tip
@@ -208,7 +211,7 @@ namespace Chatbot
                 "Change your passwords straight away if a service you use reports a data breach."
             };
 
-            return "\nChatBot: " + GetRecallPrefix("password safety") + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("password safety") + tips[random.Next(tips.Length)] + "\n";
         }
 
         // Checks if the user is expressing interest in a topic and stores it for later
@@ -251,6 +254,62 @@ namespace Chatbot
             return "";
         }
 
+        // Detects how the user is feeling based on words they used
+        // Updates the userSentiment so other responses can adjust their tone
+        public static string CheckSentiment(string input)
+        {
+            string lowerInput = input.ToLower();
+
+            // Worried or anxious words
+            if (lowerInput.Contains("worried") || lowerInput.Contains("scared") ||
+                lowerInput.Contains("anxious") || lowerInput.Contains("nervous"))
+            {
+                userSentiment = "worried";
+                return "\nChatBot: I understand this can feel worrying. Don't stress - I'm here to help you stay safe step by step.\n";
+            }
+
+            // Frustrated or angry words
+            if (lowerInput.Contains("frustrated") || lowerInput.Contains("angry") ||
+                lowerInput.Contains("annoyed") || lowerInput.Contains("confused"))
+            {
+                userSentiment = "frustrated";
+                return "\nChatBot: I get that this can be frustrating. Let's break it down together so it feels easier to handle.\n";
+            }
+
+            // Curious or interested words
+            if (lowerInput.Contains("curious") || lowerInput.Contains("wonder") ||
+                lowerInput.Contains("interesting"))
+            {
+                userSentiment = "curious";
+                return "\nChatBot: It's great that you're curious! Asking questions is the best way to learn about cybersecurity.\n";
+            }
+
+            // Overwhelmed words
+            if (lowerInput.Contains("overwhelmed") || lowerInput.Contains("too much") ||
+                lowerInput.Contains("don't understand"))
+            {
+                userSentiment = "overwhelmed";
+                return "\nChatBot: It's okay to feel overwhelmed - cybersecurity covers a lot. We can take it one small piece at a time.\n";
+            }
+
+            return "";
+        }
+
+        // Returns a small encouraging phrase based on the user's current sentiment
+        // For example "Don't worry, " or "Good question, "
+        private static string GetSentimentPrefix()
+        {
+            if (userSentiment == "worried")
+                return "Don't worry, ";
+            if (userSentiment == "frustrated")
+                return "Hang in there, ";
+            if (userSentiment == "curious")
+                return "Great question - ";
+            if (userSentiment == "overwhelmed")
+                return "Take it one step at a time. ";
+            return "";
+        }
+
         // Returns a recall phrase if the topic matches what the user is interested in
         // For example "As someone interested in privacy, "
         private static string GetRecallPrefix(string topic)
@@ -258,9 +317,9 @@ namespace Chatbot
             if (string.Equals(userInterest, topic, StringComparison.OrdinalIgnoreCase))
             {
                 string[] prefixes = {
-                    "As someone interested in " + topic + ", ",
-                    "Since you mentioned you're into " + topic + ", ",
-                    "Remembering your interest in " + topic + ", "
+                    "as someone interested in " + topic + ", ",
+                    "since you mentioned you're into " + topic + ", ",
+                    "remembering your interest in " + topic + ", "
                 };
                 return prefixes[random.Next(prefixes.Length)];
             }
@@ -271,7 +330,10 @@ namespace Chatbot
         // Returns an empty string if no keyword is found
         public static string CheckKeywords(string input)
         {
-            // First check if the user is sharing an interest
+            // First check if the user is expressing a feeling - this updates the stored sentiment
+            string sentimentResponse = CheckSentiment(input);
+
+            // Then check if the user is sharing an interest
             string interestResponse = CheckInterest(input);
             if (!string.IsNullOrEmpty(interestResponse))
                 return interestResponse;
@@ -303,7 +365,7 @@ namespace Chatbot
                     "A password manager can help you create and store strong passwords for every site you use.",
                     "Strong passwords should be at least 12 characters and mix letters, numbers and symbols."
                 };
-                return "\nChatBot: " + GetRecallPrefix("password safety") + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("password safety") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Phishing or scam keyword
@@ -314,7 +376,7 @@ namespace Chatbot
                     "Phishing scams often use fake links. Hover over a link before clicking to see where it really goes.",
                     "If an email looks suspicious, do not click any links. Go directly to the official website instead."
                 };
-                return "\nChatBot: " + GetRecallPrefix("phishing") + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("phishing") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Privacy keyword
@@ -325,7 +387,7 @@ namespace Chatbot
                     "Be careful what apps you give permissions to. Only allow access that is actually needed.",
                     "Your privacy matters. Avoid sharing personal details like your address or birthday online."
                 };
-                return "\nChatBot: " + GetRecallPrefix("privacy") + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("privacy") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Wi-Fi keyword
@@ -336,7 +398,7 @@ namespace Chatbot
                     "If you need to use public Wi-Fi, a VPN will help keep your traffic encrypted and safe.",
                     "Always make sure your home Wi-Fi is password protected with WPA2 or WPA3 encryption."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Virus or malware keyword
@@ -347,7 +409,7 @@ namespace Chatbot
                     "Never download files or attachments from sources you do not trust as they may contain malware.",
                     "Free software downloaded from random sites often comes bundled with viruses. Stick to official sources."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Hack keyword
@@ -358,10 +420,14 @@ namespace Chatbot
                     "Hackers often target weak passwords. Strong unique passwords are your best defence.",
                     "Check haveibeenpwned.com to see if your email has been involved in any known data breaches."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
             }
 
-            // No keyword matched
+            // If no keyword matched but a sentiment was detected, return the sentiment response on its own
+            if (!string.IsNullOrEmpty(sentimentResponse))
+                return sentimentResponse;
+
+            // No keyword or sentiment matched
             return "";
         }
 
