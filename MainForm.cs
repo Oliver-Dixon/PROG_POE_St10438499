@@ -118,101 +118,119 @@ namespace Chatbot
         }
 
         // Reads input and shows the matching response
+        // Wrapped in try catch so unexpected errors don't crash the program
         private void ProcessInput()
         {
-            // Check if the user typed nothing
-            if (string.IsNullOrWhiteSpace(inputBox.Text))
+            try
             {
-                chatBox.AppendText("\nChatBot: Please enter a valid option from the menu.\n");
-                return;
-            }
+                // Check if the user typed nothing
+                if (string.IsNullOrWhiteSpace(inputBox.Text))
+                {
+                    chatBox.AppendText("\nChatBot: I didn't catch that. Please type something or pick a number from the menu.\n");
+                    return;
+                }
 
-            // Store the input to compare later and trim any extra spaces
-            string userInput = inputBox.Text.Trim();
+                // Store the input to compare later and trim any extra spaces
+                string userInput = inputBox.Text.Trim();
 
-            // If we are still waiting for the name, save it and show the menu
-            if (waitingForName)
-            {
-                userName = userInput;
-                waitingForName = false;
+                // If we are still waiting for the name, save it and show the menu
+                if (waitingForName)
+                {
+                    userName = userInput;
+                    waitingForName = false;
 
-                // Show the name back to the user
+                    // Show the name back to the user
+                    chatBox.AppendText("\n[" + userName + "]: " + userInput + "\n");
+
+                    // Show welcome message and the help menu
+                    chatBox.AppendText(ChatbotFunctions.Hello(userName));
+                    chatBox.AppendText(ChatbotFunctions.Help());
+
+                    // Clear the input box for next entry
+                    inputBox.Clear();
+                    ScrollToBottom();
+                    return;
+                }
+
+                // Show what the user typed
                 chatBox.AppendText("\n[" + userName + "]: " + userInput + "\n");
 
-                // Show welcome message and the help menu
-                chatBox.AppendText(ChatbotFunctions.Hello(userName));
-                chatBox.AppendText(ChatbotFunctions.Help());
-
-                // Clear the input box for next entry
-                inputBox.Clear();
-                ScrollToBottom();
-                return;
-            }
-
-            // Show what the user typed
-            chatBox.AppendText("\n[" + userName + "]: " + userInput + "\n");
-
-            // Check which number the user entered
-            if (userInput == "1")
-            {
-                chatBox.AppendText(ChatbotFunctions.Help());
-            }
-            else if (userInput == "2")
-            {
-                chatBox.AppendText(ChatbotFunctions.Purpose(userName));
-            }
-            else if (userInput == "3")
-            {
-                chatBox.AppendText(ChatbotFunctions.HowAreYou(userName));
-            }
-            else if (userInput == "4")
-            {
-                chatBox.AppendText(ChatbotFunctions.SafeBrowsing());
-            }
-            else if (userInput == "5")
-            {
-                chatBox.AppendText(ChatbotFunctions.Phishing());
-            }
-            else if (userInput == "6")
-            {
-                chatBox.AppendText(ChatbotFunctions.PasswordSafety());
-            }
-            else if (userInput == "0")
-            {
-                // Ends the program
-                chatBox.AppendText(ChatbotFunctions.Exit(userName));
-                // Close the form after 2 seconds so the user sees the goodbye message
-                Task.Delay(2000).ContinueWith(t => this.Invoke(() => this.Close()));
-            }
-            else
-            {
-                // If it was not a menu number, try to find a keyword in the input
-                string keywordResponse = ChatbotFunctions.CheckKeywords(userInput);
-
-                // If a keyword was found show the keyword response
-                if (!string.IsNullOrEmpty(keywordResponse))
+                // Check which number the user entered
+                if (userInput == "1")
                 {
-                    chatBox.AppendText(keywordResponse);
+                    chatBox.AppendText(ChatbotFunctions.Help());
+                }
+                else if (userInput == "2")
+                {
+                    chatBox.AppendText(ChatbotFunctions.Purpose(userName));
+                }
+                else if (userInput == "3")
+                {
+                    chatBox.AppendText(ChatbotFunctions.HowAreYou(userName));
+                }
+                else if (userInput == "4")
+                {
+                    chatBox.AppendText(ChatbotFunctions.SafeBrowsing());
+                }
+                else if (userInput == "5")
+                {
+                    chatBox.AppendText(ChatbotFunctions.Phishing());
+                }
+                else if (userInput == "6")
+                {
+                    chatBox.AppendText(ChatbotFunctions.PasswordSafety());
+                }
+                else if (userInput == "0")
+                {
+                    // Ends the program
+                    chatBox.AppendText(ChatbotFunctions.Exit(userName));
+                    // Close the form after 2 seconds so the user sees the goodbye message
+                    Task.Delay(2000).ContinueWith(t => this.Invoke(() => this.Close()));
                 }
                 else
                 {
-                    // Otherwise tell the user the input was not understood
-                    chatBox.AppendText(ChatbotFunctions.Validation());
+                    // If it was not a menu number, try to find a keyword in the input
+                    string keywordResponse = ChatbotFunctions.CheckKeywords(userInput);
+
+                    // If a keyword was found show the keyword response
+                    if (!string.IsNullOrEmpty(keywordResponse))
+                    {
+                        chatBox.AppendText(keywordResponse);
+                    }
+                    else
+                    {
+                        // Otherwise tell the user the input was not understood
+                        chatBox.AppendText(ChatbotFunctions.Validation());
+                    }
                 }
+
+                // Clear the input box for next entry
+                inputBox.Clear();
+
+                // Scroll to the bottom so the latest message is visible
+                ScrollToBottom();
             }
-
-            // Clear the input box for next entry
-            inputBox.Clear();
-
-            // Scroll to the bottom so the latest message is visible
-            ScrollToBottom();
+            catch (Exception error)
+            {
+                // If anything unexpected goes wrong, show a friendly message and keep the program running
+                chatBox.AppendText("\nChatBot: Something unexpected happened but I'm still here. Please try again.\n");
+                Console.WriteLine("Error in ProcessInput: " + error.Message);
+                inputBox.Clear();
+            }
         }
 
         // Helper method to keep the chat scrolled to the bottom
         private void ScrollToBottom()
         {
-            chatBox.SelectionStart = chatBox.Text.Length;
-            chatBox.ScrollToCaret();
+            try
+            {
+                chatBox.SelectionStart = chatBox.Text.Length;
+                chatBox.ScrollToCaret();
+            }
+            catch
+            {
+                // Ignore scroll errors - they should never crash the chat
+            }
         }
     }
 }

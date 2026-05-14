@@ -296,7 +296,6 @@ namespace Chatbot
         }
 
         // Returns a small encouraging phrase based on the user's current sentiment
-        // For example "Don't worry, " or "Good question, "
         private static string GetSentimentPrefix()
         {
             if (userSentiment == "worried")
@@ -311,7 +310,6 @@ namespace Chatbot
         }
 
         // Returns a recall phrase if the topic matches what the user is interested in
-        // For example "As someone interested in privacy, "
         private static string GetRecallPrefix(string topic)
         {
             if (string.Equals(userInterest, topic, StringComparison.OrdinalIgnoreCase))
@@ -431,12 +429,20 @@ namespace Chatbot
             return "";
         }
 
-        // This handles input that the chatbot does not recognize
+        // Default response shown when the input is not recognised at all
+        // Uses a few varied phrases so it does not sound robotic
         public static string Validation()
         {
+            string[] responses = {
+                "I'm not sure I understand. Can you try rephrasing?",
+                "Hmm, I didn't quite catch that. Could you ask in a different way?",
+                "Sorry, that one went over my head. Could you rephrase your question?",
+                "I'm not sure what you mean. Try mentioning a cybersecurity topic like passwords, phishing or privacy."
+            };
+
             string output = "";
-            output += "\nChatBot: Please enter a valid option from the menu or ask about a cybersecurity topic.\n";
-            output += "ChatBot: Type 1 to see the list of available topics.\n";
+            output += "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+            output += "ChatBot: You can also type 1 to see the list of available topics.\n";
             return output;
         }
 
