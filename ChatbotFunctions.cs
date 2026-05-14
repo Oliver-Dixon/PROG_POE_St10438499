@@ -11,6 +11,9 @@ namespace Chatbot
         // Used to pick a random response so the bot feels more varied
         static Random random = new Random();
 
+        // Memory - stores the user's main interest so the bot can refer back to it later
+        static string userInterest = "";
+
         // Voice greeting
         public static void PlayVoiceGreeting()
         {
@@ -77,7 +80,7 @@ namespace Chatbot
             output += "  6 - Password safety tips\n";
             output += "  0 - Exit the chatbot\n";
             output += stars + "\n";
-            output += "  Or type a question like 'give me a phishing tip' or 'password advice'.\n";
+            output += "  Tip: tell me what you're interested in and I'll remember it!\n";
             return output;
         }
 
@@ -169,7 +172,6 @@ namespace Chatbot
         // Returns a single random phishing tip
         public static string RandomPhishingTip()
         {
-            // Store all phishing tips in an array
             string[] tips = {
                 "Be cautious of emails asking for personal information. Scammers often disguise themselves as trusted organisations.",
                 "Always check the sender's email address carefully. Phishers use addresses that look almost real but are slightly off.",
@@ -178,8 +180,7 @@ namespace Chatbot
                 "If an email has poor grammar or unexpected attachments, it is likely a phishing attempt. Delete it."
             };
 
-            // Pick a random tip from the array
-            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetRecallPrefix("phishing") + tips[random.Next(tips.Length)] + "\n";
         }
 
         // Returns a single random safe browsing tip
@@ -193,7 +194,7 @@ namespace Chatbot
                 "Bookmark important websites so you don't accidentally visit a fake version through a search engine."
             };
 
-            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetRecallPrefix("safe browsing") + tips[random.Next(tips.Length)] + "\n";
         }
 
         // Returns a single random password safety tip
@@ -207,13 +208,74 @@ namespace Chatbot
                 "Change your passwords straight away if a service you use reports a data breach."
             };
 
-            return "\nChatBot: " + tips[random.Next(tips.Length)] + "\n";
+            return "\nChatBot: " + GetRecallPrefix("password safety") + tips[random.Next(tips.Length)] + "\n";
+        }
+
+        // Checks if the user is expressing interest in a topic and stores it for later
+        public static string CheckInterest(string input)
+        {
+            string lowerInput = input.ToLower();
+
+            // Phrases that signal the user is sharing what they care about
+            bool sharingInterest = lowerInput.Contains("interested in") ||
+                                   lowerInput.Contains("want to learn about") ||
+                                   lowerInput.Contains("favourite") ||
+                                   lowerInput.Contains("favorite") ||
+                                   lowerInput.Contains("i like");
+
+            if (!sharingInterest)
+                return "";
+
+            // Figure out which topic they mentioned and save it
+            if (lowerInput.Contains("password"))
+            {
+                userInterest = "password safety";
+                return "\nChatBot: Great! I'll remember that you're interested in password safety. It's a crucial part of staying safe online.\n";
+            }
+            if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
+            {
+                userInterest = "phishing";
+                return "\nChatBot: Great! I'll remember that you're interested in phishing awareness. It's a crucial part of staying safe online.\n";
+            }
+            if (lowerInput.Contains("privacy"))
+            {
+                userInterest = "privacy";
+                return "\nChatBot: Great! I'll remember that you're interested in privacy. It's a crucial part of staying safe online.\n";
+            }
+            if (lowerInput.Contains("browsing") || lowerInput.Contains("browser"))
+            {
+                userInterest = "safe browsing";
+                return "\nChatBot: Great! I'll remember that you're interested in safe browsing. It's a crucial part of staying safe online.\n";
+            }
+
+            return "";
+        }
+
+        // Returns a recall phrase if the topic matches what the user is interested in
+        // For example "As someone interested in privacy, "
+        private static string GetRecallPrefix(string topic)
+        {
+            if (string.Equals(userInterest, topic, StringComparison.OrdinalIgnoreCase))
+            {
+                string[] prefixes = {
+                    "As someone interested in " + topic + ", ",
+                    "Since you mentioned you're into " + topic + ", ",
+                    "Remembering your interest in " + topic + ", "
+                };
+                return prefixes[random.Next(prefixes.Length)];
+            }
+            return "";
         }
 
         // Looks for cybersecurity keywords in the user's input and returns a relevant response
         // Returns an empty string if no keyword is found
         public static string CheckKeywords(string input)
         {
+            // First check if the user is sharing an interest
+            string interestResponse = CheckInterest(input);
+            if (!string.IsNullOrEmpty(interestResponse))
+                return interestResponse;
+
             // Convert to lowercase so we catch words regardless of how they were typed
             string lowerInput = input.ToLower();
 
@@ -241,7 +303,7 @@ namespace Chatbot
                     "A password manager can help you create and store strong passwords for every site you use.",
                     "Strong passwords should be at least 12 characters and mix letters, numbers and symbols."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetRecallPrefix("password safety") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Phishing or scam keyword
@@ -252,7 +314,7 @@ namespace Chatbot
                     "Phishing scams often use fake links. Hover over a link before clicking to see where it really goes.",
                     "If an email looks suspicious, do not click any links. Go directly to the official website instead."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetRecallPrefix("phishing") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Privacy keyword
@@ -263,7 +325,7 @@ namespace Chatbot
                     "Be careful what apps you give permissions to. Only allow access that is actually needed.",
                     "Your privacy matters. Avoid sharing personal details like your address or birthday online."
                 };
-                return "\nChatBot: " + responses[random.Next(responses.Length)] + "\n";
+                return "\nChatBot: " + GetRecallPrefix("privacy") + responses[random.Next(responses.Length)] + "\n";
             }
 
             // Wi-Fi keyword
