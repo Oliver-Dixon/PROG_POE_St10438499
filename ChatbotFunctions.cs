@@ -3,6 +3,25 @@ using System.Media;
 
 namespace Chatbot
 {
+    // Small class to group a topic's keywords and possible responses together
+    // This makes it much easier to add new topics in Part 3
+    public class KeywordTopic
+    {
+        public string[] Keywords = Array.Empty<string>();
+        public string[] Responses = Array.Empty<string>();
+        public string TopicName = "";
+        public bool CanBeInterest = false;
+    }
+
+    // Class to group a sentiment with its trigger words and responses
+    public class SentimentEntry
+    {
+        public string[] Keywords = Array.Empty<string>();
+        public string SentimentName = "";
+        public string AcknowledgeResponse = "";
+        public string ResponsePrefix = "";
+    }
+
     public class ChatbotFunctions
     {
         // Saves time by creating a global variable for the star separator used in multiple places
@@ -16,6 +35,162 @@ namespace Chatbot
 
         // Stores the user's current sentiment so responses can adapt
         static string userSentiment = "";
+
+        // List of all the cybersecurity topics the bot knows about
+        // Add new entries here to teach the bot new topics
+        static List<KeywordTopic> keywordTopics = new List<KeywordTopic>
+        {
+            new KeywordTopic
+            {
+                TopicName = "password safety",
+                Keywords = new[] { "password" },
+                CanBeInterest = true,
+                Responses = new[]
+                {
+                    "Make sure to use strong, unique passwords for each account. Avoid using personal details in your passwords.",
+                    "A password manager can help you create and store strong passwords for every site you use.",
+                    "Strong passwords should be at least 12 characters and mix letters, numbers and symbols."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "phishing",
+                Keywords = new[] { "phishing", "scam" },
+                CanBeInterest = true,
+                Responses = new[]
+                {
+                    "Be careful with emails that create urgency or ask for personal information. Always verify the sender first.",
+                    "Phishing scams often use fake links. Hover over a link before clicking to see where it really goes.",
+                    "If an email looks suspicious, do not click any links. Go directly to the official website instead."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "privacy",
+                Keywords = new[] { "privacy" },
+                CanBeInterest = true,
+                Responses = new[]
+                {
+                    "Review your privacy settings on social media regularly and limit what you share publicly.",
+                    "Be careful what apps you give permissions to. Only allow access that is actually needed.",
+                    "Your privacy matters. Avoid sharing personal details like your address or birthday online."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "safe browsing",
+                Keywords = new[] { "browsing", "browser" },
+                CanBeInterest = true,
+                Responses = new[]
+                {
+                    "Always check for HTTPS in the URL bar before entering any personal data.",
+                    "Keep your browser up to date to protect against known security flaws.",
+                    "Use a reputable ad-blocker to reduce your exposure to malicious advertisements."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "wifi",
+                Keywords = new[] { "wifi", "wi-fi" },
+                CanBeInterest = false,
+                Responses = new[]
+                {
+                    "Public Wi-Fi networks are not secure. Avoid logging into important accounts when connected to them.",
+                    "If you need to use public Wi-Fi, a VPN will help keep your traffic encrypted and safe.",
+                    "Always make sure your home Wi-Fi is password protected with WPA2 or WPA3 encryption."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "malware",
+                Keywords = new[] { "virus", "malware" },
+                CanBeInterest = false,
+                Responses = new[]
+                {
+                    "Keep your antivirus software up to date and run regular scans to catch threats early.",
+                    "Never download files or attachments from sources you do not trust as they may contain malware.",
+                    "Free software downloaded from random sites often comes bundled with viruses. Stick to official sources."
+                }
+            },
+            new KeywordTopic
+            {
+                TopicName = "hacking",
+                Keywords = new[] { "hack" },
+                CanBeInterest = false,
+                Responses = new[]
+                {
+                    "If you think your account has been hacked, change your password immediately and enable two-factor authentication.",
+                    "Hackers often target weak passwords. Strong unique passwords are your best defence.",
+                    "Check haveibeenpwned.com to see if your email has been involved in any known data breaches."
+                }
+            }
+        };
+
+        // List of all sentiments the bot can detect
+        // Add new entries here to teach the bot new emotions
+        static List<SentimentEntry> sentiments = new List<SentimentEntry>
+        {
+            new SentimentEntry
+            {
+                SentimentName = "worried",
+                Keywords = new[] { "worried", "scared", "anxious", "nervous" },
+                AcknowledgeResponse = "I understand this can feel worrying. Don't stress - I'm here to help you stay safe step by step.",
+                ResponsePrefix = "Don't worry, "
+            },
+            new SentimentEntry
+            {
+                SentimentName = "frustrated",
+                Keywords = new[] { "frustrated", "angry", "annoyed", "confused" },
+                AcknowledgeResponse = "I get that this can be frustrating. Let's break it down together so it feels easier to handle.",
+                ResponsePrefix = "Hang in there, "
+            },
+            new SentimentEntry
+            {
+                SentimentName = "curious",
+                Keywords = new[] { "curious", "wonder", "interesting" },
+                AcknowledgeResponse = "It's great that you're curious! Asking questions is the best way to learn about cybersecurity.",
+                ResponsePrefix = "Great question - "
+            },
+            new SentimentEntry
+            {
+                SentimentName = "overwhelmed",
+                Keywords = new[] { "overwhelmed", "too much", "don't understand" },
+                AcknowledgeResponse = "It's okay to feel overwhelmed - cybersecurity covers a lot. We can take it one small piece at a time.",
+                ResponsePrefix = "Take it one step at a time. "
+            }
+        };
+
+        // Dictionary of random tip lists for specific topics, used when the user asks for a tip
+        static Dictionary<string, string[]> randomTips = new Dictionary<string, string[]>
+        {
+            { "phishing", new[]
+                {
+                    "Be cautious of emails asking for personal information. Scammers often disguise themselves as trusted organisations.",
+                    "Always check the sender's email address carefully. Phishers use addresses that look almost real but are slightly off.",
+                    "Never click links in suspicious emails. Type the website address directly into your browser instead.",
+                    "Look out for urgent language like 'Your account will be closed!' as this is a common phishing tactic.",
+                    "If an email has poor grammar or unexpected attachments, it is likely a phishing attempt. Delete it."
+                }
+            },
+            { "safe browsing", new[]
+                {
+                    "Always check for HTTPS in the URL bar before entering any personal data.",
+                    "Keep your browser and all extensions up to date to protect against security flaws.",
+                    "Use a reputable ad-blocker to reduce your exposure to malicious advertisements.",
+                    "Avoid using public Wi-Fi for banking or shopping unless you are using a VPN.",
+                    "Bookmark important websites so you don't accidentally visit a fake version through a search engine."
+                }
+            },
+            { "password safety", new[]
+                {
+                    "Use a password manager to generate and store strong, unique passwords for every account.",
+                    "Make passwords at least 12 characters long with a mix of letters, numbers and symbols.",
+                    "Enable two-factor authentication on every account that supports it for extra security.",
+                    "Never reuse passwords across multiple sites because one breach could compromise all your accounts.",
+                    "Change your passwords straight away if a service you use reports a data breach."
+                }
+            }
+        };
 
         // Voice greeting
         public static void PlayVoiceGreeting()
@@ -106,23 +281,18 @@ namespace Chatbot
         // Safe browsing tips when the user asks about them
         public static string SafeBrowsing()
         {
-            // Store all the tips in variables
-            string tip1 = "Always check for HTTPS in the URL before entering data.";
-            string tip2 = "Avoid clicking suspicious links in emails or messages.";
-            string tip3 = "Keep your browser and extensions up to date.";
-            string tip4 = "Use an ad-blocker to reduce exposure to malicious ads.";
-            string tip5 = "Avoid using public Wi-Fi for banking without a VPN.";
+            // Pull the tip list from the dictionary
+            string[] tips = randomTips["safe browsing"];
 
             string output = "";
             output += "\n" + stars + "\n";
             output += "   Safe Browsing Tips\n";
             output += stars + "\n";
             // Print each tip with a number
-            output += "  1: " + tip1 + "\n";
-            output += "  2: " + tip2 + "\n";
-            output += "  3: " + tip3 + "\n";
-            output += "  4: " + tip4 + "\n";
-            output += "  5: " + tip5 + "\n";
+            for (int i = 0; i < tips.Length; i++)
+            {
+                output += "  " + (i + 1) + ": " + tips[i] + "\n";
+            }
             output += stars + "\n";
             return output;
         }
@@ -130,21 +300,16 @@ namespace Chatbot
         // This explains how to spot a phishing attempt
         public static string Phishing()
         {
-            string flag1 = "Urgent language like - Your account will be closed!";
-            string flag2 = "Sender addresses that look similar but are slightly off.";
-            string flag3 = "Links where the hover URL does not match the displayed text.";
-            string flag4 = "Requests for passwords or card details via email.";
-            string flag5 = "Poor grammar, odd formatting or unexpected attachments.";
+            string[] tips = randomTips["phishing"];
 
             string output = "";
             output += "\n" + stars + "\n";
             output += "   Phishing Warning Signs\n";
             output += stars + "\n";
-            output += "  1: " + flag1 + "\n";
-            output += "  2: " + flag2 + "\n";
-            output += "  3: " + flag3 + "\n";
-            output += "  4: " + flag4 + "\n";
-            output += "  5: " + flag5 + "\n";
+            for (int i = 0; i < tips.Length; i++)
+            {
+                output += "  " + (i + 1) + ": " + tips[i] + "\n";
+            }
             output += "\n  * You should never click suspicious links! *\n";
             output += stars + "\n";
             return output;
@@ -153,65 +318,30 @@ namespace Chatbot
         // This shares password safety advice
         public static string PasswordSafety()
         {
-            string advice1 = "Use at least 12 characters with letters, numbers and symbols.";
-            string advice2 = "Never reuse the same password across different accounts.";
-            string advice3 = "Enable two-factor authentication wherever possible.";
-            string advice4 = "Change your passwords regularly.";
-            string advice5 = "Avoid using personal info like birthdays or pet names.";
+            string[] tips = randomTips["password safety"];
 
             string output = "";
             output += "\n" + stars + "\n";
             output += "   Password Safety Tips\n";
             output += stars + "\n";
-            output += "  1: " + advice1 + "\n";
-            output += "  2: " + advice2 + "\n";
-            output += "  3: " + advice3 + "\n";
-            output += "  4: " + advice4 + "\n";
-            output += "  5: " + advice5 + "\n";
+            for (int i = 0; i < tips.Length; i++)
+            {
+                output += "  " + (i + 1) + ": " + tips[i] + "\n";
+            }
             output += stars + "\n";
             return output;
         }
 
-        // Returns a single random phishing tip
-        public static string RandomPhishingTip()
+        // Returns one random tip from any of the random tip lists
+        // Used when the user asks for a tip on a specific topic
+        public static string GetRandomTip(string topicName)
         {
-            string[] tips = {
-                "Be cautious of emails asking for personal information. Scammers often disguise themselves as trusted organisations.",
-                "Always check the sender's email address carefully. Phishers use addresses that look almost real but are slightly off.",
-                "Never click links in suspicious emails. Type the website address directly into your browser instead.",
-                "Look out for urgent language like 'Your account will be closed!' as this is a common phishing tactic.",
-                "If an email has poor grammar or unexpected attachments, it is likely a phishing attempt. Delete it."
-            };
+            if (!randomTips.ContainsKey(topicName))
+                return "";
 
-            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("phishing") + tips[random.Next(tips.Length)] + "\n";
-        }
-
-        // Returns a single random safe browsing tip
-        public static string RandomBrowsingTip()
-        {
-            string[] tips = {
-                "Always check for HTTPS in the URL bar before entering any personal data.",
-                "Keep your browser and all extensions up to date to protect against security flaws.",
-                "Use a reputable ad-blocker to reduce your exposure to malicious advertisements.",
-                "Avoid using public Wi-Fi for banking or shopping unless you are using a VPN.",
-                "Bookmark important websites so you don't accidentally visit a fake version through a search engine."
-            };
-
-            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("safe browsing") + tips[random.Next(tips.Length)] + "\n";
-        }
-
-        // Returns a single random password safety tip
-        public static string RandomPasswordTip()
-        {
-            string[] tips = {
-                "Use a password manager to generate and store strong, unique passwords for every account.",
-                "Make passwords at least 12 characters long with a mix of letters, numbers and symbols.",
-                "Enable two-factor authentication on every account that supports it for extra security.",
-                "Never reuse passwords across multiple sites because one breach could compromise all your accounts.",
-                "Change your passwords straight away if a service you use reports a data breach."
-            };
-
-            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("password safety") + tips[random.Next(tips.Length)] + "\n";
+            string[] tips = randomTips[topicName];
+            string chosenTip = tips[random.Next(tips.Length)];
+            return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix(topicName) + chosenTip + "\n";
         }
 
         // Checks if the user is expressing interest in a topic and stores it for later
@@ -220,35 +350,21 @@ namespace Chatbot
             string lowerInput = input.ToLower();
 
             // Phrases that signal the user is sharing what they care about
-            bool sharingInterest = lowerInput.Contains("interested in") ||
-                                   lowerInput.Contains("want to learn about") ||
-                                   lowerInput.Contains("favourite") ||
-                                   lowerInput.Contains("favorite") ||
-                                   lowerInput.Contains("i like");
+            string[] interestPhrases = { "interested in", "want to learn about", "favourite", "favorite", "i like" };
 
+            bool sharingInterest = interestPhrases.Any(phrase => lowerInput.Contains(phrase));
             if (!sharingInterest)
                 return "";
 
-            // Figure out which topic they mentioned and save it
-            if (lowerInput.Contains("password"))
+            // Look through all topics that can be remembered as interests
+            foreach (var topic in keywordTopics.Where(t => t.CanBeInterest))
             {
-                userInterest = "password safety";
-                return "\nChatBot: Great! I'll remember that you're interested in password safety. It's a crucial part of staying safe online.\n";
-            }
-            if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
-            {
-                userInterest = "phishing";
-                return "\nChatBot: Great! I'll remember that you're interested in phishing awareness. It's a crucial part of staying safe online.\n";
-            }
-            if (lowerInput.Contains("privacy"))
-            {
-                userInterest = "privacy";
-                return "\nChatBot: Great! I'll remember that you're interested in privacy. It's a crucial part of staying safe online.\n";
-            }
-            if (lowerInput.Contains("browsing") || lowerInput.Contains("browser"))
-            {
-                userInterest = "safe browsing";
-                return "\nChatBot: Great! I'll remember that you're interested in safe browsing. It's a crucial part of staying safe online.\n";
+                if (topic.Keywords.Any(keyword => lowerInput.Contains(keyword)))
+                {
+                    userInterest = topic.TopicName;
+                    return "\nChatBot: Great! I'll remember that you're interested in " + topic.TopicName +
+                           ". It's a crucial part of staying safe online.\n";
+                }
             }
 
             return "";
@@ -260,36 +376,14 @@ namespace Chatbot
         {
             string lowerInput = input.ToLower();
 
-            // Worried or anxious words
-            if (lowerInput.Contains("worried") || lowerInput.Contains("scared") ||
-                lowerInput.Contains("anxious") || lowerInput.Contains("nervous"))
+            // Loop through every sentiment and see if any keywords match
+            foreach (var sentiment in sentiments)
             {
-                userSentiment = "worried";
-                return "\nChatBot: I understand this can feel worrying. Don't stress - I'm here to help you stay safe step by step.\n";
-            }
-
-            // Frustrated or angry words
-            if (lowerInput.Contains("frustrated") || lowerInput.Contains("angry") ||
-                lowerInput.Contains("annoyed") || lowerInput.Contains("confused"))
-            {
-                userSentiment = "frustrated";
-                return "\nChatBot: I get that this can be frustrating. Let's break it down together so it feels easier to handle.\n";
-            }
-
-            // Curious or interested words
-            if (lowerInput.Contains("curious") || lowerInput.Contains("wonder") ||
-                lowerInput.Contains("interesting"))
-            {
-                userSentiment = "curious";
-                return "\nChatBot: It's great that you're curious! Asking questions is the best way to learn about cybersecurity.\n";
-            }
-
-            // Overwhelmed words
-            if (lowerInput.Contains("overwhelmed") || lowerInput.Contains("too much") ||
-                lowerInput.Contains("don't understand"))
-            {
-                userSentiment = "overwhelmed";
-                return "\nChatBot: It's okay to feel overwhelmed - cybersecurity covers a lot. We can take it one small piece at a time.\n";
+                if (sentiment.Keywords.Any(keyword => lowerInput.Contains(keyword)))
+                {
+                    userSentiment = sentiment.SentimentName;
+                    return "\nChatBot: " + sentiment.AcknowledgeResponse + "\n";
+                }
             }
 
             return "";
@@ -298,15 +392,9 @@ namespace Chatbot
         // Returns a small encouraging phrase based on the user's current sentiment
         private static string GetSentimentPrefix()
         {
-            if (userSentiment == "worried")
-                return "Don't worry, ";
-            if (userSentiment == "frustrated")
-                return "Hang in there, ";
-            if (userSentiment == "curious")
-                return "Great question - ";
-            if (userSentiment == "overwhelmed")
-                return "Take it one step at a time. ";
-            return "";
+            // Find the matching sentiment in the list and return its prefix
+            var match = sentiments.FirstOrDefault(s => s.SentimentName == userSentiment);
+            return match?.ResponsePrefix ?? "";
         }
 
         // Returns a recall phrase if the topic matches what the user is interested in
@@ -314,7 +402,8 @@ namespace Chatbot
         {
             if (string.Equals(userInterest, topic, StringComparison.OrdinalIgnoreCase))
             {
-                string[] prefixes = {
+                string[] prefixes =
+                {
                     "as someone interested in " + topic + ", ",
                     "since you mentioned you're into " + topic + ", ",
                     "remembering your interest in " + topic + ", "
@@ -342,83 +431,28 @@ namespace Chatbot
             // Check if the user is asking for a tip or advice on something
             bool askingForTip = lowerInput.Contains("tip") || lowerInput.Contains("advice");
 
-            // If they want a tip on a specific topic give them one random tip from that topic
             if (askingForTip)
             {
-                if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
-                    return RandomPhishingTip();
-                if (lowerInput.Contains("browsing") || lowerInput.Contains("browser"))
-                    return RandomBrowsingTip();
-                if (lowerInput.Contains("password"))
-                    return RandomPasswordTip();
+                // Loop through tip topics and return the matching random tip
+                foreach (var topicKey in randomTips.Keys)
+                {
+                    // Find a keyword topic that maps to this random tip key
+                    var matchingTopic = keywordTopics.FirstOrDefault(t => t.TopicName == topicKey);
+                    if (matchingTopic != null && matchingTopic.Keywords.Any(k => lowerInput.Contains(k)))
+                    {
+                        return GetRandomTip(topicKey);
+                    }
+                }
             }
 
-            // General keyword matching for when the user is not asking for a tip directly
-
-            // Password keyword with varied responses
-            if (lowerInput.Contains("password"))
+            // Loop through all keyword topics and return a response for the first match
+            foreach (var topic in keywordTopics)
             {
-                string[] responses = {
-                    "Make sure to use strong, unique passwords for each account. Avoid using personal details in your passwords.",
-                    "A password manager can help you create and store strong passwords for every site you use.",
-                    "Strong passwords should be at least 12 characters and mix letters, numbers and symbols."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("password safety") + responses[random.Next(responses.Length)] + "\n";
-            }
-
-            // Phishing or scam keyword
-            if (lowerInput.Contains("phishing") || lowerInput.Contains("scam"))
-            {
-                string[] responses = {
-                    "Be careful with emails that create urgency or ask for personal information. Always verify the sender first.",
-                    "Phishing scams often use fake links. Hover over a link before clicking to see where it really goes.",
-                    "If an email looks suspicious, do not click any links. Go directly to the official website instead."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("phishing") + responses[random.Next(responses.Length)] + "\n";
-            }
-
-            // Privacy keyword
-            if (lowerInput.Contains("privacy"))
-            {
-                string[] responses = {
-                    "Review your privacy settings on social media regularly and limit what you share publicly.",
-                    "Be careful what apps you give permissions to. Only allow access that is actually needed.",
-                    "Your privacy matters. Avoid sharing personal details like your address or birthday online."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix("privacy") + responses[random.Next(responses.Length)] + "\n";
-            }
-
-            // Wi-Fi keyword
-            if (lowerInput.Contains("wifi") || lowerInput.Contains("wi-fi"))
-            {
-                string[] responses = {
-                    "Public Wi-Fi networks are not secure. Avoid logging into important accounts when connected to them.",
-                    "If you need to use public Wi-Fi, a VPN will help keep your traffic encrypted and safe.",
-                    "Always make sure your home Wi-Fi is password protected with WPA2 or WPA3 encryption."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
-            }
-
-            // Virus or malware keyword
-            if (lowerInput.Contains("virus") || lowerInput.Contains("malware"))
-            {
-                string[] responses = {
-                    "Keep your antivirus software up to date and run regular scans to catch threats early.",
-                    "Never download files or attachments from sources you do not trust as they may contain malware.",
-                    "Free software downloaded from random sites often comes bundled with viruses. Stick to official sources."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
-            }
-
-            // Hack keyword
-            if (lowerInput.Contains("hack"))
-            {
-                string[] responses = {
-                    "If you think your account has been hacked, change your password immediately and enable two-factor authentication.",
-                    "Hackers often target weak passwords. Strong unique passwords are your best defence.",
-                    "Check haveibeenpwned.com to see if your email has been involved in any known data breaches."
-                };
-                return "\nChatBot: " + GetSentimentPrefix() + responses[random.Next(responses.Length)] + "\n";
+                if (topic.Keywords.Any(keyword => lowerInput.Contains(keyword)))
+                {
+                    string chosenResponse = topic.Responses[random.Next(topic.Responses.Length)];
+                    return "\nChatBot: " + GetSentimentPrefix() + GetRecallPrefix(topic.TopicName) + chosenResponse + "\n";
+                }
             }
 
             // If no keyword matched but a sentiment was detected, return the sentiment response on its own
@@ -430,10 +464,10 @@ namespace Chatbot
         }
 
         // Default response shown when the input is not recognised at all
-        // Uses a few varied phrases so it does not sound robotic
         public static string Validation()
         {
-            string[] responses = {
+            string[] responses =
+            {
                 "I'm not sure I understand. Can you try rephrasing?",
                 "Hmm, I didn't quite catch that. Could you ask in a different way?",
                 "Sorry, that one went over my head. Could you rephrase your question?",
