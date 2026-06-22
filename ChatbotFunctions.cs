@@ -332,6 +332,25 @@ namespace Chatbot
             return output;
         }
 
+        // Explains the task assistant commands in the same friendly menu style
+        public static string TaskMenu()
+        {
+            // A divider line to match the look of the rest of the chatbot
+            string line = "* * * * * * * * * * * * * * * * * * * * * * * * * * * *";
+
+            string text = "\n" + line + "\n";
+            text += "   CYBERSECURITY TASK ASSISTANT\n";
+            text += line + "\n";
+            text += "You can manage your tasks straight from the chat:\n";
+            text += "  - Add a task:      add task - review my privacy settings\n";
+            text += "  - View your tasks: view tasks\n";
+            text += "  - Complete a task: complete task 2\n";
+            text += "  - Delete a task:   delete task 2\n";
+            text += "Or use the buttons in the Tasks panel on the right.\n";
+            text += "When adding a task I'll ask if you'd like a reminder, e.g. 'in 3 days'.\n";
+            return text;
+        }
+
         // Returns one random tip from any of the random tip lists
         // Used when the user asks for a tip on a specific topic
         public static string GetRandomTip(string topicName)
