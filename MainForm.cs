@@ -228,6 +228,9 @@ namespace Chatbot
                 databaseReady = false;
             }
 
+            // Load any saved activity log entries from previous sessions
+            ActivityLog.Load();
+
             // Start checking for due reminders from now on
             reminderTimer.Start();
 
@@ -343,6 +346,10 @@ namespace Chatbot
                 {
                     StartQuiz();
                 }
+                else if (userInput == "9")
+                {
+                    ShowActivityLog();
+                }
                 else if (userInput == "0")
                 {
                     // Ends the program
@@ -358,6 +365,7 @@ namespace Chatbot
                     else
                     {
                         chatBox.AppendText(TaskManager.StartAddTask(userInput));
+                        NlpProcessor.LogAction("Added a task from the chat");
                         RefreshTaskList();
                     }
                 }
@@ -370,11 +378,23 @@ namespace Chatbot
                 {
                     // The user typed something like "complete task 2" or "delete task 3"
                     chatBox.AppendText(TaskManager.HandleManagementCommand(userInput));
+                    NlpProcessor.LogAction("Updated a task from the chat");
                     RefreshTaskList();
                 }
                 else if (IsQuizCommand(userInput))
                 {
                     StartQuiz();
+                }
+                else if (IsActivityLogCommand(userInput))
+                {
+                    ShowActivityLog();
+                }
+                else if (NlpProcessor.IsSummaryRequest(userInput))
+                {
+                    chatBox.AppendText(NlpProcessor.GetActionSummary());
+                }
+                else if (HandleNlp(userInput))
+                {
                 }
                 else
                 {
@@ -385,6 +405,7 @@ namespace Chatbot
                     if (!string.IsNullOrEmpty(keywordResponse))
                     {
                         chatBox.AppendText(keywordResponse);
+                        NlpProcessor.LogAction("Asked about a cybersecurity topic");
                     }
                     else
                     {
@@ -448,6 +469,7 @@ namespace Chatbot
                 if (dialog.ShowDialog() == DialogResult.OK && dialog.CreatedTask != null)
                 {
                     DatabaseHelper.AddTask(dialog.CreatedTask);
+                    NlpProcessor.LogAction("Added a task: " + dialog.CreatedTask.Title);
                     chatBox.AppendText("\nChatBot: Task added: " + dialog.CreatedTask.Title + "\n");
                     RefreshTaskList();
                     ScrollToBottom();
@@ -461,6 +483,7 @@ namespace Chatbot
             int id = GetSelectedTaskId();
             if (id < 0) { chatBox.AppendText("\nChatBot: Please select a task first.\n"); return; }
             DatabaseHelper.MarkComplete(id);
+            NlpProcessor.LogAction("Completed task #" + id);
             chatBox.AppendText("\nChatBot: Nice work! Task #" + id + " is marked complete.\n");
             RefreshTaskList();
             ScrollToBottom();
@@ -477,6 +500,7 @@ namespace Chatbot
             if (answer == DialogResult.Yes)
             {
                 DatabaseHelper.DeleteTask(id);
+                NlpProcessor.LogAction("Deleted task #" + id);
                 chatBox.AppendText("\nChatBot: Task #" + id + " has been deleted.\n");
                 RefreshTaskList();
                 ScrollToBottom();
@@ -534,8 +558,39 @@ namespace Chatbot
             {
                 quiz.ShowDialog(this);
             }
+            NlpProcessor.LogAction("Played the cybersecurity quiz");
             chatBox.AppendText("\nChatBot: Thanks for playing! Type 8 any time to play again.\n");
             ScrollToBottom();
+        }
+
+        private void ShowActivityLog()
+        {
+            chatBox.AppendText("\nChatBot: Opening your activity log...\n");
+            ScrollToBottom();
+            using (var log = new ActivityLogForm())
+            {
+                log.ShowDialog(this);
+            }
+        }
+
+        private bool IsActivityLogCommand(string input)
+        {
+            string lower = input.ToLower().Trim();
+            return lower == "activity log" || lower == "activity" || lower == "log"
+                || lower == "history" || lower.Contains("activity log")
+                || lower.Contains("view log") || lower.Contains("show log")
+                || lower.Contains("show history") || lower.Contains("view history")
+                || lower.Contains("my history");
+        }
+
+        private bool HandleNlp(string userInput)
+        {
+            string response = NlpProcessor.Respond(userInput, databaseReady);
+            if (string.IsNullOrEmpty(response))
+                return false;
+            chatBox.AppendText(response);
+            RefreshTaskList();
+            return true;
         }
 
         // Helper method to keep the chat scrolled to the bottom
