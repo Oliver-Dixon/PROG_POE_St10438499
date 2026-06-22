@@ -19,14 +19,14 @@ namespace Chatbot
 
         // --- Task assistant additions ---
         private bool databaseReady = false;               // Did MySQL connect successfully?
-        private Panel tasksPanel;                         // Right hand panel holding the task list
-        private Label tasksTitle;                         // Heading above the task grid
-        private DataGridView taskGrid;                    // Shows the saved tasks in a table
-        private Button addTaskButton;                     // Opens the add task dialog
-        private Button completeButton;                    // Marks the selected task complete
-        private Button deleteButton;                      // Deletes the selected task
-        private Button refreshButton;                     // Reloads the list from the database
-        private System.Windows.Forms.Timer reminderTimer; // Checks for due reminders every minute
+        private Panel tasksPanel = null!;                 // Right hand panel holding the task list
+        private Label tasksTitle = null!;                 // Heading above the task grid
+        private DataGridView taskGrid = null!;            // Shows the saved tasks in a table
+        private Button addTaskButton = null!;             // Opens the add task dialog
+        private Button completeButton = null!;            // Marks the selected task complete
+        private Button deleteButton = null!;              // Deletes the selected task
+        private Button refreshButton = null!;             // Reloads the list from the database
+        private System.Windows.Forms.Timer reminderTimer = null!; // Checks for due reminders every minute
 
         // Layout numbers shared by the chat column and the tasks panel
         private int margin = 20;
@@ -339,6 +339,10 @@ namespace Chatbot
                     chatBox.AppendText(ChatbotFunctions.TaskMenu());
                     ListTasksInChat();
                 }
+                else if (userInput == "8")
+                {
+                    StartQuiz();
+                }
                 else if (userInput == "0")
                 {
                     // Ends the program
@@ -367,6 +371,10 @@ namespace Chatbot
                     // The user typed something like "complete task 2" or "delete task 3"
                     chatBox.AppendText(TaskManager.HandleManagementCommand(userInput));
                     RefreshTaskList();
+                }
+                else if (IsQuizCommand(userInput))
+                {
+                    StartQuiz();
                 }
                 else
                 {
@@ -507,6 +515,27 @@ namespace Chatbot
             if (!databaseReady) { chatBox.AppendText(TaskUnavailableMessage()); return; }
             try { chatBox.AppendText(TaskManager.ListTasksText()); }
             catch { chatBox.AppendText(TaskUnavailableMessage()); }
+        }
+
+        private bool IsQuizCommand(string input)
+        {
+            string lower = input.ToLower().Trim();
+            return lower == "quiz" || lower == "play" || lower == "play quiz"
+                || lower == "mini game" || lower == "minigame" || lower == "game"
+                || lower.Contains("play the quiz") || lower.Contains("start quiz")
+                || lower.Contains("play the game") || lower.Contains("mini-game");
+        }
+
+        private void StartQuiz()
+        {
+            chatBox.AppendText("\nChatBot: Let's test your cybersecurity knowledge! Opening the quiz...\n");
+            ScrollToBottom();
+            using (var quiz = new QuizForm())
+            {
+                quiz.ShowDialog(this);
+            }
+            chatBox.AppendText("\nChatBot: Thanks for playing! Type 8 any time to play again.\n");
+            ScrollToBottom();
         }
 
         // Helper method to keep the chat scrolled to the bottom

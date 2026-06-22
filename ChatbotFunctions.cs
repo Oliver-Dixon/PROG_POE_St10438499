@@ -256,6 +256,8 @@ namespace Chatbot
             output += "  4 - Safe browsing tips\n";
             output += "  5 - Phishing warning signs\n";
             output += "  6 - Password safety tips\n";
+            output += "  7 - View and manage your cybersecurity tasks\n";
+            output += "  8 - Play the cybersecurity quiz\n";
             output += "  0 - Exit the chatbot\n";
             output += stars + "\n";
             output += "  Tip: tell me what you're interested in and I'll remember it!\n";
